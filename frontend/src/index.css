@@ -1,0 +1,28 @@
+@import "tailwindcss";
+
+/* This tells Tailwind to use the 'dark' class for dark mode toggling */
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  /* REAL GOLD COLORS */
+  --color-gold: #D4AF37;        /* True Metallic Gold */
+  --color-gold-light: #F9D976;  /* Shiny highlight */
+  --color-gold-dark: #B8860B;   /* Deep shadow */
+
+  /* BACKGROUNDS */
+  --color-luxury-black: #0A0A0A;
+  --color-luxury-white: #F8F9FA;
+}
+
+/* Base Light Mode Styles */
+body {
+  background-color: var(--color-luxury-white);
+  color: #111827; /* Dark gray text for readability */
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Dark Mode Overrides */
+.dark body {
+  background-color: var(--color-luxury-black);
+  color: #ffffff;
+}
