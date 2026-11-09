@@ -1,28 +1,37 @@
 @import "tailwindcss";
 
-/* This tells Tailwind to use the 'dark' class for dark mode toggling */
 @custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
-  /* REAL GOLD COLORS */
-  --color-gold: #D4AF37;        /* True Metallic Gold */
-  --color-gold-light: #F9D976;  /* Shiny highlight */
-  --color-gold-dark: #B8860B;   /* Deep shadow */
+  --color-luxury-black: #050505;
+  --color-luxury-white: #FAFAFA;
+  
+  --color-gold-base: #D4AF37;
+  --color-gold-light: #F9D976;
+  --color-gold-dark: #B8860B;
 
-  /* BACKGROUNDS */
-  --color-luxury-black: #0A0A0A;
-  --color-luxury-white: #F8F9FA;
+  --font-serif: "Cinzel", serif;
+  --font-decorative: "Cinzel Decorative", serif; 
+  --font-sans: "Montserrat", sans-serif;
 }
 
-/* Base Light Mode Styles */
+/* Base Body Styles */
 body {
   background-color: var(--color-luxury-white);
-  color: #111827; /* Dark gray text for readability */
+  color: #000000; /* EXACT BLACK */
+  font-family: var(--font-sans);
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-/* Dark Mode Overrides */
 .dark body {
   background-color: var(--color-luxury-black);
-  color: #ffffff;
+  color: #F3F4F6;
+}
+
+/* Metallic Gold Text Gradient */
+.text-gold-gradient {
+  background: linear-gradient(to right, var(--color-gold-dark), var(--color-gold-base), var(--color-gold-light), var(--color-gold-base));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }

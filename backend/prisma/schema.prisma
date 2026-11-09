@@ -1,0 +1,131 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// 1. USERS (Admins, Managers, Accountants, Tenants)
+model User {
+  id        String   @id @default(uuid())
+  name      String
+  email     String   @unique
+  password  String
+  role      Role     @default(TENANT)
+  createdAt DateTime @default(now())
+
+  leases        Lease[]
+  invoices      Invoice[]
+  maintenance   MaintenanceRequest[]
+}
+
+enum Role {
+  SUPER_ADMIN
+  MANAGER
+  ACCOUNTANT
+  MAINTENANCE
+  TENANT
+}
+
+// 2. APARTMENTS
+model Apartment {
+  id          String   @id @default(uuid())
+  title       String
+  description String
+  price       Float
+  bedrooms    Int
+  bathrooms   Int
+  sizeSqm     Float
+  status      ApartmentStatus @default(AVAILABLE)
+  images      String[] // Array of image URLs
+  createdAt   DateTime @default(now())
+
+  inquiries   Inquiry[]
+  leases      Lease[]
+  maintenance MaintenanceRequest[]
+}
+
+enum ApartmentStatus {
+  AVAILABLE
+  RENTED
+  MAINTENANCE
+}
+
+// 3. INQUIRIES (Leads from Public Website)
+model Inquiry {
+  id          String   @id @default(uuid())
+  name        String
+  email       String
+  phone       String
+  message     String
+  status      InquiryStatus @default(NEW)
+  apartmentId String
+  apartment   Apartment @relation(fields: [apartmentId], references: [id])
+  createdAt   DateTime @default(now())
+}
+
+enum InquiryStatus {
+  NEW
+  CONTACTED
+  CLOSED
+}
+
+// 4. LEASES (Rental Agreements)
+model Lease {
+  id          String   @id @default(uuid())
+  startDate   DateTime
+  endDate     DateTime
+  rentAmount  Float
+  status      LeaseStatus @default(ACTIVE)
+  tenantId    String
+  tenant      User     @relation(fields: [tenantId], references: [id])
+  apartmentId String
+  apartment   Apartment @relation(fields: [apartmentId], references: [id])
+  
+  invoices    Invoice[]
+}
+
+enum LeaseStatus {
+  ACTIVE
+  EXPIRED
+  TERMINATED
+}
+
+// 5. INVOICES (Rent Payments)
+model Invoice {
+  id        String   @id @default(uuid())
+  amount    Float
+  dueDate   DateTime
+  status    InvoiceStatus @default(UNPAID)
+  leaseId   String
+  lease     Lease    @relation(fields: [leaseId], references: [id])
+  tenantId  String
+  tenant    User     @relation(fields: [tenantId], references: [id])
+  createdAt DateTime @default(now())
+}
+
+enum InvoiceStatus {
+  PAID
+  UNPAID
+  LATE
+}
+
+// 6. MAINTENANCE REQUESTS
+model MaintenanceRequest {
+  id          String   @id @default(uuid())
+  issue       String
+  status      MaintenanceStatus @default(PENDING)
+  tenantId    String
+  tenant      User     @relation(fields: [tenantId], references: [id])
+  apartmentId String
+  apartment   Apartment @relation(fields: [apartmentId], references: [id])
+  createdAt   DateTime @default(now())
+}
+
+enum MaintenanceStatus {
+  PENDING
+  IN_PROGRESS
+  RESOLVED
+}

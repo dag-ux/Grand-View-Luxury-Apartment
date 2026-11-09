@@ -1,25 +1,31 @@
-import ThemeToggle from './components/ThemeToggle';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import Navbar from './components/Navbar';
+import Footer from './components/Footer';
+import Home from './pages/Home';
+import Login from './pages/Login';
+import Register from './pages/Register';
+import Dashboard from './pages/Dashboard';
+import Apartments from './pages/Apartments';
+import ApartmentDetail from './pages/ApartmentDetail';
 
 function App() {
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-8">
-      {/* Assuming you saved your logo as logo.png in the public folder */}
-      <img 
-        src="/logo.png" 
-        alt="Grand View Logo" 
-        className="w-48 h-48 rounded-full mb-8 shadow-2xl shadow-gold/20" 
-      />
-      
-      <h1 className="text-4xl md:text-5xl font-bold text-gold mb-4 text-center">
-        Grand View Luxury Apartments
-      </h1>
-      
-      <p className="mb-8 text-center max-w-lg opacity-80">
-        Experience unparalleled luxury in Bole Rwanda, Addis Ababa.
-      </p>
-
-      <ThemeToggle />
-    </div>
+    <Router>
+      <div className="flex flex-col min-h-screen bg-luxury-white dark:bg-luxury-black text-black dark:text-white font-sans transition-colors duration-300">
+        <Navbar />
+        <main className="flex-grow">
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/apartments" element={<Apartments />} />
+            <Route path="/apartments/:id" element={<ApartmentDetail />} />
+          </Routes>
+        </main>
+        <Footer />
+      </div>
+    </Router>
   );
 }
 
