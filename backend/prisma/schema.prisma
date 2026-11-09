@@ -39,7 +39,9 @@ model Apartment {
   bathrooms   Int
   sizeSqm     Float
   status      ApartmentStatus @default(AVAILABLE)
-  images      String[] // Array of image URLs
+  listingType ListingType     @default(RENT)
+  images      String[]
+  videoUrl    String?         // <-- ADD THIS LINE
   createdAt   DateTime @default(now())
 
   inquiries   Inquiry[]
@@ -50,7 +52,13 @@ model Apartment {
 enum ApartmentStatus {
   AVAILABLE
   RENTED
+  SOLD
   MAINTENANCE
+}
+
+enum ListingType {
+  RENT
+  SALE
 }
 
 // 3. INQUIRIES (Leads from Public Website)
@@ -60,9 +68,10 @@ model Inquiry {
   email       String
   phone       String
   message     String
+  intent      ListingType @default(RENT) // <-- NEW: Did they ask to Rent or Buy?
   status      InquiryStatus @default(NEW)
-  apartmentId String
-  apartment   Apartment @relation(fields: [apartmentId], references: [id])
+  apartmentId String?
+  apartment   Apartment? @relation(fields: [apartmentId], references: [id])
   createdAt   DateTime @default(now())
 }
 
