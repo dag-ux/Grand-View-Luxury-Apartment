@@ -7,6 +7,8 @@ import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import Apartments from './pages/Apartments';
 import ApartmentDetail from './pages/ApartmentDetail';
+import Amenities from './pages/Amenities'; // <-- NEW
+import Contact from './pages/Contact'; // <-- NEW
 
 function App() {
   return (
@@ -21,6 +23,8 @@ function App() {
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/apartments" element={<Apartments />} />
             <Route path="/apartments/:id" element={<ApartmentDetail />} />
+            <Route path="/amenities" element={<Amenities />} /> {/* <-- NEW */}
+            <Route path="/contact" element={<Contact />} /> {/* <-- NEW */}
           </Routes>
         </main>
         <Footer />

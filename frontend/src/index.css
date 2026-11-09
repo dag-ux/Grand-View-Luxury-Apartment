@@ -15,10 +15,9 @@
   --font-sans: "Montserrat", sans-serif;
 }
 
-/* Base Body Styles */
 body {
   background-color: var(--color-luxury-white);
-  color: #000000; /* EXACT BLACK */
+  color: #000000;
   font-family: var(--font-sans);
   transition: background-color 0.3s ease, color 0.3s ease;
 }
@@ -28,10 +27,52 @@ body {
   color: #F3F4F6;
 }
 
-/* Metallic Gold Text Gradient */
 .text-gold-gradient {
   background: linear-gradient(to right, var(--color-gold-dark), var(--color-gold-base), var(--color-gold-light), var(--color-gold-base));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+}
+
+/* --- LUXURY SHINE EFFECTS --- */
+@keyframes gold-shine {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+.shine-button {
+  background-size: 200% auto;
+  animation: gold-shine 3s linear infinite;
+  transition: all 0.3s ease;
+}
+
+.shine-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.shine-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(to right, transparent, rgba(212, 175, 55, 0.1), transparent);
+  transform: skewX(-25deg);
+  transition: left 0.7s ease;
+}
+
+.shine-card:hover::before {
+  left: 150%;
+}
+
+.card-glow {
+  transition: all 0.4s ease;
+}
+
+.card-glow:hover {
+  box-shadow: 0 10px 40px -10px rgba(212, 175, 55, 0.3);
+  border-color: rgba(212, 175, 55, 0.5);
+  transform: translateY(-5px);
 }
