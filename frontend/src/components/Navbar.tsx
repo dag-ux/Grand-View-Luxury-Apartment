@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import ThemeToggle from './ThemeToggle';
 import logo from '../assets/logo.jpg';
@@ -6,7 +6,21 @@ import { Home, Building2, Sparkles, Phone, User, Menu, X, Info } from 'lucide-re
 
 export default function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false); // NEW: Scroll state
   const location = useLocation();
+
+  // NEW: Listen for scroll to change navbar style
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 20) {
+        setIsScrolled(true);
+      } else {
+        setIsScrolled(false);
+      }
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const navLinks = [
     { name: 'Home', path: '/', icon: <Home size={14} /> },
@@ -19,12 +33,18 @@ export default function Navbar() {
   const isActive = (path: string) => location.pathname === path;
 
   return (
-    <nav className="fixed w-full top-0 z-50 bg-white/95 dark:bg-luxury-black/95 backdrop-blur-md border-b border-gray-200 dark:border-gold-base/20 transition-all duration-300">
+    <nav 
+      className={`fixed w-full top-0 z-50 transition-all duration-300 ${
+        isScrolled 
+          ? 'bg-white/98 dark:bg-luxury-black/98 shadow-lg border-b border-gray-200 dark:border-gold-base/30 backdrop-blur-xl' 
+          : 'bg-white/90 dark:bg-luxury-black/90 backdrop-blur-md border-b border-transparent'
+      }`}
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-20 md:h-24">
+        <div className="flex items-center justify-between h-20 md:h-24 transition-all duration-300">
           
           {/* Logo Area */}
-          <div className="flex-shrink-0 flex items-center">
+          <div className="shrink-0 flex items-center">
             <Link to="/" className="flex items-center gap-2 sm:gap-4 group">
               <img src={logo} alt="GrandView Addis Logo" className="h-10 w-10 sm:h-12 sm:w-12 md:h-14 md:w-14 rounded-full border border-gold-base/50 object-cover group-hover:border-gold-base transition-colors shadow-lg" />
               <div className="flex flex-col">
@@ -50,16 +70,15 @@ export default function Navbar() {
               >
                 <span className="opacity-60 group-hover:opacity-100 transition-opacity">{link.icon}</span>
                 {link.name}
-                {/* Elegant underline */}
-                <span className={`absolute bottom-0 left-0 w-full h-[2px] bg-gold-base transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left ${isActive(link.path) ? 'scale-x-100' : ''}`}></span>
+                <span className={`absolute bottom-0 left-0 w-full h-0.5 bg-gold-base transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left ${isActive(link.path) ? 'scale-x-100' : ''}`}></span>
               </Link>
             ))}
           </div>
 
-          {/* Right Side Actions (Desktop) */}
+          {/* Right Side Actions */}
           <div className="hidden lg:flex items-center gap-4 xl:gap-6">
             <ThemeToggle />
-            <Link to="/login" className="group flex items-center gap-2 bg-gradient-to-r from-gold-dark via-gold-base to-gold-light text-black px-5 xl:px-6 py-2.5 rounded-full font-bold text-[10px] xl:text-xs uppercase tracking-widest transition-all duration-300 shadow-[0_4px_15px_rgba(212,175,55,0.3)] hover:shadow-[0_6px_20px_rgba(212,175,55,0.5)] hover:-translate-y-0.5">
+            <Link to="/login" className="group flex items-center gap-2 bg-linear-to-r from-gold-dark via-gold-base to-gold-light text-black px-5 xl:px-6 py-2.5 rounded-full font-bold text-[10px] xl:text-xs uppercase tracking-widest transition-all duration-300 shadow-[0_4px_15px_rgba(212,175,55,0.3)] hover:shadow-[0_6px_20px_rgba(212,175,55,0.5)] hover:-translate-y-0.5">
               <User size={16} className="group-hover:scale-110 transition-transform" /> Login
             </Link>
           </div>
@@ -75,7 +94,7 @@ export default function Navbar() {
       </div>
 
       {/* Mobile Menu Dropdown */}
-      <div className={`lg:hidden absolute top-20 md:top-24 left-0 w-full bg-white dark:bg-luxury-black border-b border-gray-200 dark:border-gold-base/20 transition-all duration-500 ease-in-out overflow-hidden shadow-2xl ${isMobileMenuOpen ? 'max-h-[600px] opacity-100' : 'max-h-0 opacity-0'}`}>
+      <div className={`lg:hidden absolute top-20 md:top-24 left-0 w-full bg-white dark:bg-luxury-black border-b border-gray-200 dark:border-gold-base/20 transition-all duration-500 ease-in-out overflow-hidden shadow-2xl ${isMobileMenuOpen ? 'max-h-150 opacity-100' : 'max-h-0 opacity-0'}`}>
         <div className="px-4 pt-4 pb-8 space-y-2">
           {navLinks.map((link) => (
             <Link 
@@ -88,7 +107,7 @@ export default function Navbar() {
             </Link>
           ))}
           <div className="pt-4 mt-2 border-t border-gray-200 dark:border-gray-800">
-            <Link to="/login" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center justify-center gap-2 w-full bg-gradient-to-r from-gold-dark via-gold-base to-gold-light text-black px-6 py-4 rounded-full font-bold text-xs uppercase tracking-widest shadow-lg">
+            <Link to="/login" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center justify-center gap-2 w-full bg-linear-to-r from-gold-dark via-gold-base to-gold-light text-black px-6 py-4 rounded-full font-bold text-xs uppercase tracking-widest shadow-lg">
               <User size={18} /> Login
             </Link>
           </div>
