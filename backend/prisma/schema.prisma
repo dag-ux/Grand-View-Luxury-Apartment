@@ -40,8 +40,8 @@ model Apartment {
   sizeSqm     Float
   status      ApartmentStatus @default(AVAILABLE)
   listingType ListingType     @default(RENT)
-  images      String[]
-  videoUrl    String?         // <-- ADD THIS LINE
+  images      Json            // <-- Stores { url, category } objects
+  videoUrl    String?         
   createdAt   DateTime @default(now())
 
   inquiries   Inquiry[]
@@ -68,7 +68,7 @@ model Inquiry {
   email       String
   phone       String
   message     String
-  intent      ListingType @default(RENT) // <-- NEW: Did they ask to Rent or Buy?
+  intent      ListingType @default(RENT)
   status      InquiryStatus @default(NEW)
   apartmentId String?
   apartment   Apartment? @relation(fields: [apartmentId], references: [id])

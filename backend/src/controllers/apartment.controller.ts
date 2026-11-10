@@ -2,23 +2,51 @@ import { Request, Response } from 'express';
 import { prisma } from '../lib/prisma';
 import { ApartmentStatus } from '@prisma/client';
 
+// Helper to handle image parsing safely
+const parseImages = (files: any, existingImagesJson: string, imageCategoriesJson: string) => {
+  let finalImages: { url: string, category: string }[] = [];
+  
+  // 1. Add existing images (for edit)
+  if (existingImagesJson) {
+    try {
+      const parsed = JSON.parse(existingImagesJson);
+      if (Array.isArray(parsed)) {
+        finalImages = parsed.map((img: any) => {
+          // Fallback for old data that was just a string
+          if (typeof img === 'string') return { url: img, category: 'General' }; 
+          return img;
+        });
+      }
+    } catch (e) {
+      console.error("Error parsing existing images", e);
+    }
+  }
+
+  // 2. Add new uploaded images with their categories
+  if (files && files['images']) {
+    let categories = [];
+    try {
+      categories = JSON.parse(imageCategoriesJson || '[]');
+    } catch(e) { console.error("Error parsing categories", e); }
+
+    const newImages = files['images'].map((file: any, index: number) => ({
+      url: `/uploads/${file.filename}`,
+      category: categories[index] || 'General'
+    }));
+    finalImages = [...finalImages, ...newImages];
+  }
+  
+  return finalImages;
+};
+
 export const createApartment = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { title, description, price, bedrooms, bathrooms, sizeSqm, listingType, existingImages, videoUrl } = req.body;
-    
+    const { title, description, price, bedrooms, bathrooms, sizeSqm, listingType, imageCategories } = req.body;
     const files = req.files as { [fieldname: string]: Express.Multer.File[] };
-    let images: string[] = [];
     
-    if (files && files['images']) {
-      images = files['images'].map(file => `/uploads/${file.filename}`);
-    }
-    
-    if (existingImages) {
-      const parsedExisting = JSON.parse(existingImages);
-      images = [...parsedExisting, ...images];
-    }
+    const images = parseImages(files, '', imageCategories);
 
-    let finalVideoUrl = videoUrl || null;
+    let finalVideoUrl = req.body.videoUrl || null;
     if (files && files['video'] && files['video'][0]) {
       finalVideoUrl = `/uploads/${files['video'][0].filename}`;
     }
@@ -32,7 +60,7 @@ export const createApartment = async (req: Request, res: Response): Promise<void
         bathrooms: Number(bathrooms), 
         sizeSqm: Number(sizeSqm), 
         images, 
-        videoUrl: finalVideoUrl,
+        videoUrl: finalVideoUrl, 
         status: ApartmentStatus.AVAILABLE, 
         listingType: listingType || 'RENT' 
       },
@@ -48,21 +76,10 @@ export const createApartment = async (req: Request, res: Response): Promise<void
 export const updateApartment = async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
-    const { title, description, price, bedrooms, bathrooms, sizeSqm, listingType, existingImages, videoUrl } = req.body;
-    
+    const { title, description, price, bedrooms, bathrooms, sizeSqm, listingType, existingImages, imageCategories, videoUrl } = req.body;
     const files = req.files as { [fieldname: string]: Express.Multer.File[] };
-    let images: string[] = [];
     
-    // Process new files
-    if (files && files['images']) {
-      images = files['images'].map(file => `/uploads/${file.filename}`);
-    }
-    
-    // Process existing images (this will be an empty array if all were deleted by the user)
-    if (existingImages) {
-      const parsedExisting = JSON.parse(existingImages);
-      images = [...parsedExisting, ...images];
-    }
+    const images = parseImages(files, existingImages, imageCategories);
 
     let finalVideoUrl = videoUrl || null;
     if (files && files['video'] && files['video'][0]) {
@@ -77,9 +94,9 @@ export const updateApartment = async (req: Request, res: Response): Promise<void
         price: Number(price), 
         bedrooms: Number(bedrooms), 
         bathrooms: Number(bathrooms), 
-        sizeSqm: Number(sizeSqm),
-        listingType,
-        images: images, // <-- FIXED: Always update images array
+        sizeSqm: Number(sizeSqm), 
+        listingType, 
+        images, 
         videoUrl: finalVideoUrl
       }
     });
